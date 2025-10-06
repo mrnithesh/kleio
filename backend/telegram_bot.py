@@ -1,5 +1,5 @@
-
 import os
+import re
 import logging
 from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
@@ -23,6 +23,54 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 WEBHOOK_SECRET = os.getenv("TELEGRAM_WEBHOOK_SECRET")
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
+
+# ============================================================================
+# Telegram MarkdownV2 Escaping Functions
+# ============================================================================
+
+def escape_markdown_v2(text: str) -> str:
+    """
+    Escape special characters for Telegram MarkdownV2.
+    Characters that need escaping: _ * [ ] ( ) ~ ` > # + - = | { } . !
+    """
+    # Escape all special characters except * and _ (used for formatting)
+    escape_chars = r'[\\`>#+\-=|{}.!()[\]]'
+    return re.sub(escape_chars, r'\\\g<0>', text)
+
+def format_telegram_message(text: str) -> str:
+    """
+    Format a message for Telegram with proper MarkdownV2 escaping.
+    Preserves *bold* and _italic_ formatting while escaping special characters.
+    """
+    parts = []
+    current_pos = 0
+    
+    # Find all formatting markers: *text* or _text_
+    pattern = r'(\*[^*]+\*|_[^_]+_)'
+    
+    for match in re.finditer(pattern, text):
+        # Escape unformatted text before this match
+        if match.start() > current_pos:
+            unformatted = text[current_pos:match.start()]
+            parts.append(escape_markdown_v2(unformatted))
+        
+        # Handle formatted text (preserve markers, escape content)
+        formatted = match.group(0)
+        marker = formatted[0]
+        content = formatted[1:-1]
+        parts.append(f"{marker}{escape_markdown_v2(content)}{marker}")
+        
+        current_pos = match.end()
+    
+    # Escape remaining text
+    if current_pos < len(text):
+        parts.append(escape_markdown_v2(text[current_pos:]))
+    
+    return ''.join(parts)
+
+# ============================================================================
+# Command Handlers
+# ============================================================================
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle the /start command."""
@@ -96,9 +144,34 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await bot.send_chat_action(chat_id=chat_id, action="typing")
 
-    response = await process_message(user.firebase_uid, message_text, str(chat_id))
-
-    await update.message.reply_text(response, parse_mode='MarkdownV2')
+    try:
+        # Get response from agent
+        response = await process_message(user.firebase_uid, message_text, str(chat_id))
+        
+        # ✅ Format the response with proper MarkdownV2 escaping
+        formatted_response = format_telegram_message(response)
+        
+        logger.info(f"📨 Sending formatted response (length: {len(formatted_response)})")
+        
+        # Send with MarkdownV2 parsing
+        await update.message.reply_text(formatted_response, parse_mode='MarkdownV2')
+        
+    except Exception as e:
+        logger.error(f"❌ Error sending message with MarkdownV2: {e}")
+        logger.error(f"Raw response: {response}")
+        logger.error(f"Formatted response: {formatted_response if 'formatted_response' in locals() else 'N/A'}")
+        
+        # Fallback: send without formatting
+        try:
+            await update.message.reply_text(
+                "⚠️ Response received, but there was a formatting issue. Here's the plain text:\n\n" + response,
+                parse_mode=None
+            )
+        except Exception as fallback_error:
+            logger.error(f"❌ Fallback also failed: {fallback_error}")
+            await update.message.reply_text(
+                "❌ Sorry, I encountered an error processing your request. Please try again."
+            )
 
 
 def run_bot():

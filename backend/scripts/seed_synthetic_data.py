@@ -2,6 +2,7 @@
 # Usage:
 #   python backend/scripts/seed_synthetic_data.py --uid <FIREBASE_UID> [--weeks 4] [--months 6] [--reset]
 #  python scripts/seed_synthetic_data.py --uid LONo1WRY7XTbLSmx8uy4jC5YGo22 --reset --weeks 4 --months 6
+#  python scripts/seed_synthetic_data.py --uid ol0ce2Zvy1bvA6aYVkN4ywjdOHB2 --reset --weeks 4 --months 6
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

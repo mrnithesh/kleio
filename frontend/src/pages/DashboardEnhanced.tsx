@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Sparkles, Package, Receipt, ChefHat, LogOut, TrendingUp, AlertTriangle, ShoppingCart, Calendar, Settings } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
@@ -136,10 +137,20 @@ const DashboardEnhanced = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6 sm:py-8">
-        {/* Pattern Summary Cards */}
-        <div className="mb-6 sm:mb-8">
-          <PatternSummaryCards />
-        </div>
+        {/* Collapsible Pattern Summary Cards */}
+        <Accordion type="single" collapsible className="w-full mb-6 sm:mb-8 border rounded-lg">
+          <AccordionItem value="patterns">
+            <AccordionTrigger className="px-4 py-3">
+              <div className="flex items-center gap-3">
+                <TrendingUp className="w-5 h-5 text-primary" />
+                <h2 className="text-base sm:text-lg font-semibold">Consumption Insights</h2>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="p-4">
+              <PatternSummaryCards />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
@@ -208,7 +219,7 @@ const DashboardEnhanced = () => {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
             <TabsTrigger value="inventory" className="text-xs sm:text-sm">
               <Package className="w-4 h-4 mr-1 sm:mr-2" />
               <span>Inventory</span>
@@ -224,6 +235,10 @@ const DashboardEnhanced = () => {
             <TabsTrigger value="shopping" className="text-xs sm:text-sm">
               <ShoppingCart className="w-4 h-4 mr-1 sm:mr-2" />
               <span>Shopping</span>
+            </TabsTrigger>
+            <TabsTrigger value="insights" className="text-xs sm:text-sm">
+              <TrendingUp className="w-4 h-4 mr-1 sm:mr-2" />
+              <span>Insights</span>
             </TabsTrigger>
           </TabsList>
 
@@ -287,34 +302,20 @@ const DashboardEnhanced = () => {
 
           {/* Shopping Tab */}
           <TabsContent value="shopping" className="space-y-4">
-            <Tabs defaultValue="list" className="space-y-4">
-              <div className="border-b">
-                <TabsList className="bg-transparent border-0">
-                  <TabsTrigger 
-                    value="list" 
-                    className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
-                  >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Shopping List
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="insights"
-                    className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
-                  >
-                    <TrendingUp className="w-4 h-4 mr-2" />
-                    Pattern Insights
-                  </TabsTrigger>
-                </TabsList>
+             <div>
+                <h2 className="text-xl sm:text-2xl font-bold">Smart Shopping List</h2>
+                <p className="text-sm text-muted-foreground">AI-powered suggestions based on your needs</p>
               </div>
+            <SmartShoppingList />
+          </TabsContent>
 
-              <TabsContent value="list">
-                <SmartShoppingList />
-              </TabsContent>
-
-              <TabsContent value="insights">
-                <PatternInsights />
-              </TabsContent>
-            </Tabs>
+          {/* Insights Tab */}
+          <TabsContent value="insights" className="space-y-4">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold">Consumption Patterns</h2>
+              <p className="text-sm text-muted-foreground">Analyze your household's consumption habits</p>
+            </div>
+            <PatternInsights />
           </TabsContent>
         </Tabs>
       </main>
