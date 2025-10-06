@@ -70,9 +70,11 @@ def create_inventory_item(
         return existing_item
     else:
         # Create new item
+        item_dict = item_data.model_dump()
+        item_dict.pop("estimated_shelf_life_days", None)
         new_item = Inventory(
             firebase_uid=firebase_uid,
-            **item_data.model_dump()
+            **item_dict
         )
         
         db.add(new_item)
