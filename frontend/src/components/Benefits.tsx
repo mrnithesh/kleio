@@ -11,14 +11,6 @@ const benefits = [
     gradient: "from-primary/20 to-primary/5",
   },
   {
-    icon: Clock,
-    title: "5 Hours Back Each Week",
-    description: "Stop planning, list-making, and market research. Focus on your family instead",
-    stat: "60% Time Saved",
-    color: "text-secondary",
-    gradient: "from-secondary/20 to-secondary/5",
-  },
-  {
     icon: Leaf,
     title: "40% Less Food Waste",
     description: "Smart consumption tracking and recipe suggestions mean fresh food gets used",

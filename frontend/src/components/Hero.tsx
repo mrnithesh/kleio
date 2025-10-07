@@ -69,10 +69,6 @@ export const Hero = () => {
                 <div className="text-3xl font-bold text-secondary">30%</div>
                 <div className="text-sm text-muted-foreground">Cost Savings</div>
               </div>
-              <div className="space-y-1">
-                <div className="text-3xl font-bold text-accent">5hrs</div>
-                <div className="text-sm text-muted-foreground">Time Saved/Week</div>
-              </div>
             </div>
           </div>
 

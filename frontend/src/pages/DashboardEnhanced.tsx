@@ -108,9 +108,7 @@ const DashboardEnhanced = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg gradient-hero flex items-center justify-center shadow-md">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
+              <img src="/logo.png" alt="Kleio.ai" className="w-10 h-10 rounded-lg shadow-md" />
               <div>
                 <h1 className="text-xl font-bold text-primary">Kleio.ai</h1>
                 <p className="text-xs text-muted-foreground">Smart Inventory</p>
